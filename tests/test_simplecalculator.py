@@ -6,3 +6,6 @@ def test_adding_two_numbers():
 
 def test_adding_another_two_numbers():
     assert add(2,3) == 5
+
+def test_adding_more_numbers():
+    assert add(5, 7) == 12
