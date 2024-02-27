@@ -14,10 +14,10 @@ class Worker:
         self._tasks: List[asyncio.Task] = []
 
     async def handle_update(self, upd: UpdateObj):
-        print("before", upd.message.text, datetime.datetime.now())
-        await asyncio.sleep(10)
-        print("after", upd.message.text, datetime.datetime.now())
-        await self.tg_client.send_message(upd.message.chat.id, upd.message.text)
+        print("before", upd['message']['text'], datetime.datetime.now())
+        await asyncio.sleep(1)
+        print("after", upd['message']['text'], datetime.datetime.now())
+        await self.tg_client.send_message(upd['message']['chat']['id'], upd['message']['text'])
 
     async def _worker(self):
         while True:
