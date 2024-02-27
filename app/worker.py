@@ -1,9 +1,8 @@
 import asyncio
-import datetime
+# import datetime
 from typing import List
 
 from client.client import TgClient
-from client.response_templates import UpdateObj
 
 
 class Worker:
@@ -13,11 +12,9 @@ class Worker:
         self.concurrent_workers = concurrent_workers
         self._tasks: List[asyncio.Task] = []
 
-    async def handle_update(self, upd: UpdateObj):
-        print("before", upd['message']['text'], datetime.datetime.now())
-        await asyncio.sleep(1)
-        print("after", upd['message']['text'], datetime.datetime.now())
-        await self.tg_client.send_message(upd['message']['chat']['id'], upd['message']['text'])
+    async def handle_update(self, upd):
+        if upd['message']['text'] == '/test':
+            await self.tg_client.send_message(upd['message']['chat']['id'], 'Привет!\nЯ Бобот.\nЯ научился обрабатывать одну команду!')
 
     async def _worker(self):
         while True:

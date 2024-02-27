@@ -1,6 +1,6 @@
 import aiohttp
 from typing import Optional
-# from client.response_templates import GetUpdatesResponse, SendMessageResponse
+
 
 class TgClient:
     """Клиент для общения с Telegram API"""
