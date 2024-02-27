@@ -1,3 +1,4 @@
+"""Pylint просит докстринг к импортам"""
 import asyncio  
 from app.poller import Poller
 from app.worker import Worker

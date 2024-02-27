@@ -1,3 +1,4 @@
+"""Pylint просит докстринг к импортам"""
 import asyncio
 import datetime
 import os

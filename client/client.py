@@ -1,5 +1,6 @@
-import aiohttp
+"""Pylint просит докстринг к импортам"""
 from typing import Optional
+import aiohttp
 
 
 class TgClient:
@@ -31,6 +32,7 @@ class TgClient:
                 return await resp.json()
 
     async def get_updates_in_objects(self, offset: Optional[int] = None, timeout: int = 0):
+        """Получение сообщений """
         res_dict = await self.get_updates(offset=offset, timeout=timeout)
         return res_dict
 
