@@ -26,8 +26,8 @@ RUN pip install -r requirements.txt
 COPY . $APP_DIR
 
 # Выдаем пользователю права на испольняемый файл, чтобы он смог его запустить.
-RUN setfacl -R -m u:web:rwx $APP_DIR/local-start-bot.sh
+RUN setfacl -R -m u:web:rwx $APP_DIR/run_bot.py
 
 USER web
 
-ENTRYPOINT ["/opt/app/local-start-bot.sh"]
+ENTRYPOINT ["python", "./run_bot.py", ".env"]
