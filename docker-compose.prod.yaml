@@ -1,0 +1,29 @@
+version: '3'
+
+volumes:
+  postgres_prod_volume:
+
+name: prod_project
+
+services:
+  note-db:
+    image: postgres:14.0
+    env_file:
+      - .env.prod
+    volumes:
+      - postgres_prod_volume:/var/lib/postgresql/data
+#    ports:
+#      - "${PG_PORT}:5432"
+    expose:
+       - "${PG_PORT}"
+    command: -p ${PG_PORT}
+
+  application:
+    build:
+      dockerfile: local-bot.Dockerfile
+    env_file:
+      - .env.prod
+    depends_on:
+      - note-db
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
