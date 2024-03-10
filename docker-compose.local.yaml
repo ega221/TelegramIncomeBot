@@ -6,7 +6,7 @@ volumes:
 name: local_project
 
 services:
-  note-db:
+  bot-db:
     image: postgres:14.0
     env_file:
       - .env.local
