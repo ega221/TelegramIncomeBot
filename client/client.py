@@ -1,4 +1,5 @@
 """Pylint просит докстринг к импортам"""
+import asyncio
 from typing import Optional
 import aiohttp
 
@@ -17,7 +18,9 @@ class TgClient:
         url = self.get_url("getMe")
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                return await resp.json()
+                res_dict = await asyncio.create_task(resp.json())
+                return res_dict
+                
 
     async def get_updates(self, offset: Optional[int] = None, timeout: int = 0) -> dict:
         """Получение сообщений с бота"""
@@ -29,11 +32,13 @@ class TgClient:
             params['timeout'] = timeout
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params) as resp:
-                return await resp.json()
+                res_dict = await asyncio.create_task(resp.json())
+                return res_dict
+                
 
     async def get_updates_in_objects(self, offset: Optional[int] = None, timeout: int = 0):
         """Получение сообщений """
-        res_dict = await self.get_updates(offset=offset, timeout=timeout)
+        res_dict = await asyncio.create_task(self.get_updates(offset=offset, timeout=timeout))
         return res_dict
 
     async def send_message(self, chat_id: int, text: str):
@@ -45,5 +50,5 @@ class TgClient:
         }
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=payload) as resp:
-                res_dict = await resp.json()
+                res_dict = await asyncio.create_task(resp.json())
                 return res_dict
