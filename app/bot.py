@@ -1,22 +1,27 @@
 """Pylint просит докстринг к импортам"""
-import asyncio  
+
+import asyncio
+
 from app.poller import Poller
 from app.worker import Worker
+from client.client import TgClient
 
 
 class Bot:
     """Класс для запуска и остановки бота."""
-    def __init__(self, token: str, n: int):
+
+    def __init__(self, token: str):
+        self.tg_client = TgClient(token)
         self.queue = asyncio.Queue()
-        self.poller = Poller(token, self.queue)
-        self.worker = Worker(token, self.queue, n)
+        self.poller = Poller(self.queue, self.tg_client)
+        self.worker = Worker(self.queue, self.tg_client)
 
     async def start(self):
-        """Класс для запуска работы бота."""
+        """Метод для запуска работы бота."""
         await self.poller.start()
         await self.worker.start()
 
     async def stop(self):
-        """Класс для остановки работы бота."""
+        """Метод для остановки работы бота."""
         await self.poller.stop()
         await self.worker.stop()
