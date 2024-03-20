@@ -13,7 +13,8 @@ async def delay(delay_seconds: int, message: str) -> int:
 class Worker:
     """Обработка задач из очереди"""
 
-    def __init__(self, queue: asyncio.Queue, tg_client: TgClient):
+    def __init__(self, queue: asyncio.Queue, tg_client: TgClient, timeout=60):
+        self.timeout = timeout
         self.tg_client = tg_client
         self.queue = queue
         self._task: asyncio.Task = None
@@ -42,6 +43,6 @@ class Worker:
     async def stop(self):
         """Метод, который останавливает воркер и прекращает задачу"""
         try:
-            await asyncio.wait_for(self.queue.join(), timeout=60)
+            await asyncio.wait_for(self.queue.join(), timeout=self.timeout)
         finally:
             self._task.cancel()

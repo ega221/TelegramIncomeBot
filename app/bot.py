@@ -14,7 +14,7 @@ class Bot:
         self.tg_client = TgClient(token)
         self.queue = asyncio.Queue()
         self.poller = Poller(self.queue, self.tg_client)
-        self.worker = Worker(self.queue, self.tg_client)
+        self.worker = Worker(self.queue, self.tg_client, timeout=60)
 
     async def start(self):
         """Метод для запуска работы бота."""
