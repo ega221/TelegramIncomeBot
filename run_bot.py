@@ -14,7 +14,14 @@ load_dotenv()
 async def run():
     """Метод для запуска бота."""
     loop = asyncio.get_event_loop()
-    bot = Bot(os.getenv("API_TOKEN"))
+
+    bot = Bot(
+        token=os.getenv("API_TOKEN"),
+        queue_maxsize=int(os.getenv("QUEUE_MAX_SIZE")),
+        queue_timeout=int(os.getenv("QUEUE_TIMEOUT")),
+        update_timeout=int(os.getenv("UPDATES_TIMEOUT")),
+        tg_api_url=os.getenv('TG_URL')
+        )
 
     try:
         print("bot has been started")
