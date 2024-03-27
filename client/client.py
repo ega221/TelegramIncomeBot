@@ -8,12 +8,13 @@ import aiohttp
 class TgClient:
     """Клиент для общения с Telegram API"""
 
-    def __init__(self, token: str = ""):
+    def __init__(self, token: str = "", tg_api_url: str = 'https://api.telegram.org/bot'):
         self.token = token
+        self.tg_api_url = tg_api_url
 
     def get_url(self, method: str):
         """Запрос к Telegram API"""
-        return f"https://api.telegram.org/bot{self.token}/{method}"
+        return f"{self.tg_api_url}{self.token}/{method}"
 
     async def get_me(self) -> dict:
         """Вывод информации о боботе"""
