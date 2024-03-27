@@ -3,6 +3,7 @@
 import asyncio
 from client.client import TgClient
 
+
 async def delay(delay_seconds: int, message: str) -> int:
     print(f"засыпаю на {delay_seconds} сек с сообщения {message}")
     await asyncio.sleep(delay_seconds)
@@ -13,8 +14,9 @@ async def delay(delay_seconds: int, message: str) -> int:
 class Worker:
     """Обработка задач из очереди"""
 
-    def __init__(self, queue: asyncio.Queue, tg_client: TgClient, timeout=60):
-        self.timeout = timeout
+    def __init__(
+        self, queue: asyncio.Queue, tg_client: TgClient, queue_timeout: int = 60):
+        self.queue_timeout = queue_timeout
         self.tg_client = tg_client
         self.queue = queue
         self._task: asyncio.Task = None
@@ -32,8 +34,7 @@ class Worker:
     async def _worker(self):
         """Работяга, который достает апдейты из очереди и запускает асинхронную задачу"""
         while True:
-            task_get_upd = self.queue.get()
-            upd = await task_get_upd
+            upd = await self.queue.get()
             asyncio.create_task(self._do_task(upd))
 
     async def start(self):
@@ -43,6 +44,6 @@ class Worker:
     async def stop(self):
         """Метод, который останавливает воркер и прекращает задачу"""
         try:
-            await asyncio.wait_for(self.queue.join(), timeout=self.timeout)
+            await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
         finally:
             self._task.cancel()
