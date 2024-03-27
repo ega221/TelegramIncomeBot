@@ -11,8 +11,8 @@ class Bot:
     """Класс для запуска и остановки бота."""
 
     def __init__(
-        self, token: str, queue_maxsize: int, queue_timeout: int, update_timeout: int):
-        self.tg_client = TgClient(token)
+        self, token: str, queue_maxsize: int, queue_timeout: int, update_timeout: int, tg_api_url: str):
+        self.tg_client = TgClient(token, tg_api_url)
         self.queue = asyncio.Queue(maxsize=queue_maxsize)
         self.poller = Poller(self.queue, self.tg_client, update_timeout=update_timeout)
         self.worker = Worker(self.queue, self.tg_client, queue_timeout=queue_timeout)
