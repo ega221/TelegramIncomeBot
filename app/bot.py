@@ -10,11 +10,12 @@ from client.client import TgClient
 class Bot:
     """Класс для запуска и остановки бота."""
 
-    def __init__(self, token: str):
+    def __init__(
+        self, token: str, queue_maxsize: int, queue_timeout: int, update_timeout: int):
         self.tg_client = TgClient(token)
-        self.queue = asyncio.Queue()
-        self.poller = Poller(self.queue, self.tg_client)
-        self.worker = Worker(self.queue, self.tg_client, timeout=60)
+        self.queue = asyncio.Queue(maxsize=queue_maxsize)
+        self.poller = Poller(self.queue, self.tg_client, update_timeout=update_timeout)
+        self.worker = Worker(self.queue, self.tg_client, queue_timeout=queue_timeout)
 
     async def start(self):
         """Метод для запуска работы бота."""
