@@ -12,14 +12,15 @@ class Poller:
         self.queue = queue
         self.update_timeout = update_timeout
         self._task: asyncio.Task = None
-        
 
     async def _worker(self):
         """Работяга, который выполняет получение апдейтов из телеграма и добавлением их в очередь"""
         offset = 0
         while True:
             task = asyncio.create_task(
-                self.tg_client.get_updates_in_objects(offset=offset, timeout=self.update_timeout)
+                self.tg_client.get_updates_in_objects(
+                    offset=offset, timeout=self.update_timeout
+                )
             )
             res = await task
             for upd in res["result"]:
