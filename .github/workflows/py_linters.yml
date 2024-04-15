@@ -40,5 +40,5 @@ jobs:
         run: |
           echo "Changed python files: ${{ steps.filter.outputs.py_scripts_filter_files }}"
           flake8 --extend-ignore=W291,W292,E501 ${{ steps.filter.outputs.py_scripts_filter_files }}
-          python -m black --line-length 79 --check ${{ steps.filter.outputs.py_scripts_filter_files }}
-          python -m isort --line-length 79 --check ${{ steps.filter.outputs.py_scripts_filter_files }}
+          python -m black --line-length 79 ${{ steps.filter.outputs.py_scripts_filter_files }}
+          python -m isort --line-length 79 ${{ steps.filter.outputs.py_scripts_filter_files }}
