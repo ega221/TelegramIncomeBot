@@ -36,7 +36,7 @@ async def run():
 
     try:
         print("bot has been started")
-        loop.create_task(bot.start())
+        await loop.create_task(bot.start())
         loop.run_forever()
     except KeyboardInterrupt:
         print("\nstopping", datetime.datetime.now())
