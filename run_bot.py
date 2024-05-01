@@ -20,8 +20,8 @@ async def run():
         queue_maxsize=int(os.getenv("QUEUE_MAX_SIZE")),
         queue_timeout=int(os.getenv("QUEUE_TIMEOUT")),
         update_timeout=int(os.getenv("UPDATES_TIMEOUT")),
-        tg_api_url=os.getenv('TG_URL')
-        )
+        tg_api_url=os.getenv("TG_URL"),
+    )
 
     try:
         print("bot has been started")

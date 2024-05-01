@@ -15,7 +15,8 @@ class Worker:
     """Обработка задач из очереди"""
 
     def __init__(
-        self, queue: asyncio.Queue, tg_client: TgClient, queue_timeout: int = 60):
+        self, queue: asyncio.Queue, tg_client: TgClient, queue_timeout: int = 60
+    ):
         self.queue_timeout = queue_timeout
         self.tg_client = tg_client
         self.queue = queue

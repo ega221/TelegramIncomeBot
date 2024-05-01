@@ -8,7 +8,9 @@ import aiohttp
 class TgClient:
     """Клиент для общения с Telegram API"""
 
-    def __init__(self, token: str = "", tg_api_url: str = 'https://api.telegram.org/bot'):
+    def __init__(
+        self, token: str = "", tg_api_url: str = "https://api.telegram.org/bot"
+    ):
         self.token = token
         self.tg_api_url = tg_api_url
 
