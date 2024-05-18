@@ -1,6 +1,7 @@
 """Pylint просит докстринг к импортам"""
 
 import asyncio
+import asyncpg
 import datetime
 import os
 import nest_asyncio
@@ -9,6 +10,16 @@ from app.bot import Bot
 
 nest_asyncio.apply()
 load_dotenv()
+
+
+async def create_pool():
+    return await asyncpg.create_pool(
+        database=os.getenv("POSTGRES_DB"),
+        user=os.getenv("POSTGRES_USER"),
+        password=os.getenv("POSTGRES_PASSWORD"),
+        port=os.getenv("PG_PORT"),
+        host=os.getenv("PG_HOST"),
+    )
 
 
 async def run():
@@ -20,8 +31,8 @@ async def run():
         queue_maxsize=int(os.getenv("QUEUE_MAX_SIZE")),
         queue_timeout=int(os.getenv("QUEUE_TIMEOUT")),
         update_timeout=int(os.getenv("UPDATES_TIMEOUT")),
-        tg_api_url=os.getenv('TG_URL')
-        )
+        tg_api_url=os.getenv("TG_URL"),
+    )
 
     try:
         print("bot has been started")

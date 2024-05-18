@@ -30,6 +30,7 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+
 # Settings from env files
 class MigrationSettings(BaseSettings):
     pg_host: str
@@ -80,9 +81,7 @@ def run_migrations_online() -> None:
     connectable = create_engine(url)
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
@@ -90,7 +89,7 @@ def run_migrations_online() -> None:
 
 def _get_env_path() -> str:
     x_arguments = context.get_x_argument(as_dictionary=True)
-    env_path = x_arguments.get('env_path')
+    env_path = x_arguments.get("env_path")
 
     return env_path
 
