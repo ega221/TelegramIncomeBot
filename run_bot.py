@@ -7,15 +7,6 @@ import os
 import nest_asyncio
 from dotenv import load_dotenv
 from app.bot import Bot
-from repository.expense_category_repository.expense_category_repository_impl import (
-    ExpenseCategoryRepositoryImpl,
-)
-from repository.expense_repository.expense_repository_impl import ExpenseRepositoryImpl
-from repository.income_category_repository.income_category_repository_impl import (
-    IncomeCategoryRepositoryImpl,
-)
-from repository.income_repository.income_repository_impl import IncomeRepositoryImpl
-from repository.user_repository.user_repository_impl import UserRepositoryImpl
 
 nest_asyncio.apply()
 load_dotenv()
@@ -34,13 +25,6 @@ async def create_pool():
 async def run():
     """Метод для запуска бота."""
     loop = asyncio.get_event_loop()
-    pool = await create_pool()
-
-    user_repository = UserRepositoryImpl(pool)
-    expense_category_repository = ExpenseCategoryRepositoryImpl(pool)
-    expense_repository = ExpenseRepositoryImpl(pool)
-    income_category_repository = IncomeCategoryRepositoryImpl(pool)
-    income_repository = IncomeRepositoryImpl(pool)
 
     bot = Bot(
         token=os.getenv("API_TOKEN"),
