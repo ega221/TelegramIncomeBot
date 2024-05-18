@@ -2,9 +2,6 @@ import asyncpg
 
 from model.expense_category import ExpenseCategory
 from model.user import User
-from repository.income_category_repository.income_category_repository_impl import (
-    IncomeCategoryRepositoryImpl,
-)
 
 from repository.interface import ExpenseCategoryRepository
 
