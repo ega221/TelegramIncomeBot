@@ -67,10 +67,3 @@ class ExpenseCategoryRepositoryImpl(ExpenseCategoryRepository):
                 )
                 categories.append(category)
             return categories
-
-    def use_case(self):
-        repo1 = ExpenseCategoryRepositoryImpl
-        repo2 = IncomeCategoryRepositoryImpl
-
-        await repo1.save()
-        await repo2.save()
