@@ -8,9 +8,7 @@ import aiohttp
 class TgClient:
     """Клиент для общения с Telegram API"""
 
-    def __init__(
-        self, token: str = "", tg_api_url: str = "https://api.telegram.org/bot"
-    ):
+    def __init__(self, token: str = "", tg_api_url: str = "https://api.telegram.org/bot"):
         self.token = token
         self.tg_api_url = tg_api_url
 
@@ -41,13 +39,9 @@ class TgClient:
                 res_dict = await task
                 return res_dict
 
-    async def get_updates_in_objects(
-        self, offset: Optional[int] = None, timeout: int = 0
-    ):
+    async def get_updates_in_objects(self, offset: Optional[int] = None, timeout: int = 0):
         """Получение сообщений"""
-        res_dict = await asyncio.create_task(
-            self.get_updates(offset=offset, timeout=timeout)
-        )
+        res_dict = await asyncio.create_task(self.get_updates(offset=offset, timeout=timeout))
         return res_dict
 
     async def send_message(self, chat_id: int, text: str):

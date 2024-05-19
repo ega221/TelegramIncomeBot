@@ -1,6 +1,8 @@
 import dataclasses
+from typing import Optional
 
 
 @dataclasses.dataclass
 class User:
-    id: int
+    telegram_id: int
+    id: Optional[int] = None
