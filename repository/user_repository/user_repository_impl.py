@@ -7,12 +7,14 @@ from repository.interface import UserRepository
 class UserRepositoryImpl(UserRepository):
 
     async def save(self, conn: connection, user: User):
-        await conn.execute(
+        result = await conn.fetchrow(
             """
-            INSERT INTO users(id) VALUES($1)
+            INSERT INTO users(telegram_id) VALUES($1) RETURNING id
             """,
-            user.id,
+            user.telegram_id,
         )
+        user.id = result["id"]
+        return user
 
     async def get_user_by_id(self, conn: connection, user_id) -> User | None:
         record = await conn.fetchrow(
@@ -22,7 +24,7 @@ class UserRepositoryImpl(UserRepository):
             user_id,
         )
         if record:
-            return User(id=record["id"])
+            return User(id=record["id"], telegram_id=record["telegram_id"])
         else:
             return None
 
