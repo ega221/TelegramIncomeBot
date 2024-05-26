@@ -39,6 +39,6 @@ jobs:
         if: ${{ (steps.filter.outputs.py_scripts_filter == 'true') }}
         run: |
           echo "Changed python files: ${{ steps.filter.outputs.py_scripts_filter_files }}"
-          flake8 --max-line-length = 120 --extend-ignore=W291,W292,E501 ${{ steps.filter.outputs.py_scripts_filter_files }}
+          flake8 --max-line-length=120 --extend-ignore=W291,W292,E501 ${{ steps.filter.outputs.py_scripts_filter_files }}
           python -m black --line-length 120 ${{ steps.filter.outputs.py_scripts_filter_files }}
           python -m isort --line-length 120 ${{ steps.filter.outputs.py_scripts_filter_files }}
