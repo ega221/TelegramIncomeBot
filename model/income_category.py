@@ -1,8 +1,9 @@
 import dataclasses
+from typing import Optional
 
 
 @dataclasses.dataclass
 class IncomeCategory:
-    id: int
     user_id: int
     category_name: str
+    id: Optional[int] = None
