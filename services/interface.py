@@ -4,7 +4,7 @@ from model.expense import Expense
 from typing import Union
 
 
-class IncomeService:
+class Service:
     async def initiate(self, user_id: int):
         pass
 
