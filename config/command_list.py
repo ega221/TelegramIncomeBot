@@ -1,9 +1,9 @@
 """Файл, содержащий enum со всеми командами"""
 
-from enum import Enum
+from enum import StrEnum
 
 
-class Commands(str, Enum):
+class CommandsEnum(StrEnum):
     """str enum, который хранит в себе все команды"""
 
     make_income = "/make_income"
@@ -15,6 +15,3 @@ class Commands(str, Enum):
     def get_commands(cls):
         """Метод возвращает список из всех доступных команд"""
         return [value.value for value in cls]
-
-
-Commands = Commands()
