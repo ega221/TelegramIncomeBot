@@ -48,7 +48,7 @@ class Dispatcher:
         # except Exception as e:
         #     result = e
 
-        return Update(chat_id=upd.chat_id, text=result, update_id=upd.update_id)
+        return Update(chat_id=upd.chat_id, text=result.text, update_id=upd.update_id)
 
     @staticmethod
     async def to_service(state, upd):
