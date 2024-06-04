@@ -9,7 +9,7 @@ def is_string_with_letters(argument: str):
     return isinstance(argument, str) and argument.isalpha()
 
 
-def category_validator(coroutine_func: Awaitable):
+def validate_category(coroutine_func: Awaitable):
     """Декоратор для валидации строки с категорией.
     Он проверяет, что в строке содержатся только буквы"""
 
