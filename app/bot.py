@@ -1,9 +1,11 @@
 """Pylint просит докстринг к импортам"""
 
 import asyncio
+
 from app.poller import Poller
 from app.worker import Worker
 from client.client import TgClient
+from dispatcher.dispatcher import Dispatcher
 
 
 class Bot:
@@ -20,7 +22,12 @@ class Bot:
         self.tg_client = TgClient(token, tg_api_url)
         self.queue = asyncio.Queue(maxsize=queue_maxsize)
         self.poller = Poller(self.queue, self.tg_client, update_timeout=update_timeout)
-        self.worker = Worker(self.queue, self.tg_client, queue_timeout=queue_timeout)
+        self.worker = Worker(
+            self.queue,
+            self.tg_client,
+            queue_timeout=queue_timeout,
+            dispatcher=Dispatcher(),
+        )
 
     async def start(self):
         """Метод для запуска работы бота."""

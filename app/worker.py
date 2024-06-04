@@ -1,7 +1,9 @@
 """Pylint просит докстринг к импортам"""
 
 import asyncio
+
 from client.client import TgClient
+from dispatcher.dispatcher import Dispatcher
 
 
 async def delay(delay_seconds: int, message: str) -> int:
@@ -14,19 +16,41 @@ async def delay(delay_seconds: int, message: str) -> int:
 class Worker:
     """Обработка задач из очереди"""
 
-    def __init__(self, queue: asyncio.Queue, tg_client: TgClient, queue_timeout: int = 60):
+    def __init__(
+        self,
+        queue: asyncio.Queue,
+        tg_client: TgClient,
+        dispatcher: Dispatcher,
+        queue_timeout: int = 60,
+    ):
         self.queue_timeout = queue_timeout
         self.tg_client = tg_client
         self.queue = queue
         self._task: asyncio.Task = None
+        self.dispatcher = dispatcher
 
     async def _do_task(self, upd):
         """Метод, который передает информацию апдейта в другие серсивы"""
         try:
-            task = asyncio.create_task(delay(3, upd["message"]["text"]))
+            task = asyncio.create_task(delay(1, upd["message"]["text"]))
             await task
+
+            print(upd)
+            print(upd["message"]["chat"]["id"])
+            print(upd["message"]["text"])
+
+            task_upd = asyncio.create_task(self.dispatcher.update(upd))
+            res = await task_upd
+
+            task_send = asyncio.create_task(
+                self.tg_client.send_message(
+                    upd["message"]["chat"]["id"], res["message"]["text"]
+                )
+            )
+            await task_send
+
             # if upd['message']['text'] == '/test':
-            # await self.tg_client.send_message(upd['message']['chat']['id'], 'Привет!\nЯ Бобот.\nЯ научился обрабатывать одну команду!')
+            # await
         finally:
             self.queue.task_done()
 
@@ -43,6 +67,10 @@ class Worker:
     async def stop(self):
         """Метод, который останавливает воркер и прекращает задачу"""
         try:
-            await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
+            # await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
+            results = await asyncio.gather(self.queue.join(), return_exceptions=True)
+            exceptions = [res for res in results if isinstance(res, Exception)]
+            # successful_results = [res for res in results if not isinstance(res, Exception)]
+            print(exceptions)
         finally:
             self._task.cancel()
