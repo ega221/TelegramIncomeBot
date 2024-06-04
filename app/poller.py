@@ -1,6 +1,7 @@
 """Pylint просит докстринг к импортам"""
 
 import asyncio
+
 from client.client import TgClient
 
 
@@ -18,12 +19,14 @@ class Poller:
         offset = 0
         while True:
             task = asyncio.create_task(
-                self.tg_client.get_updates_in_objects(offset=offset, timeout=self.update_timeout)
+                self.tg_client.get_updates_in_objects(
+                    offset=offset, timeout=self.update_timeout
+                )
             )
-            res = await task
-            for upd in res["result"]:
-                offset = upd["update_id"] + 1
-                await self.queue.put(upd)
+            upd = await task
+            # for upd in res:
+            offset = upd.update_id + 1
+            await self.queue.put(upd)
 
     async def start(self):
         """Метод, который запускает поллер"""
