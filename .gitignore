@@ -161,3 +161,5 @@ cython_debug/
 
 .python-version
 /my_venv/
+.env.prod
+.env.local

@@ -1,3 +1,5 @@
+"""Модуль, реализующий интерфейс сервиса"""
+
 from datetime import datetime
 from model.transient_expense import TransientExpense
 from model.transient_income import TransientIncome

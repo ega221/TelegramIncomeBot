@@ -1,3 +1,5 @@
+"""Модуль с реализацией интерфейса кэша"""
+
 from model.transient_income import TransientIncome
 from model.transient_expense import TransientExpense
 
