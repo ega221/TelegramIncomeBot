@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from model.expense import Expense
 from model.messages import Message
-from model.response_templates import Update
+from model.tg_update import Update
 from model.transient_expense import TransientExpense
 from repository.interface import (
     ExpenseCategoryRepository,
@@ -15,6 +15,9 @@ from repository.interface import (
 from services.interface import Service
 from transaction.transaction_manager import TransactionManager
 from user_cache.interface import UserCache
+from validators.category_validator import validate_category
+from validators.date_validator import validate_date
+from validators.number_validator import validate_number
 
 DATETIME_SPLIT_CHAR = "-"
 
@@ -38,26 +41,40 @@ class ExpenseServiceImpl(Service):
         """Метод, инициализирующий временный Expense в кэше"""
         payload = TransientExpense(telegram_id=upd.telegram_id)
         self.user_cache.update(upd.telegram_id, payload)
-        return Message.INITIATE_EXPENSE
+        async with self.transaction_manager.get_connection() as conn:
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
+            categories = await self.expense_cat_repo.get_categories_by_user(conn, user)
+            category_string = "\n".join([cat.category_name for cat in categories])
+        return Message.INITIATE_INCOME + category_string
 
+    @validate_category
     async def set_category(self, upd: Update) -> Message:
         """Метод, устанавливающий для пользователя с заданным
         telegram_id нужную категорию
         """
         payload = self.user_cache.get(upd.telegram_id)
-        payload.category_name = upd.text
-        self.user_cache.update(upd.telegram_id, payload)
-        return Message.CATEGORY_SET
+        async with self.transaction_manager.get_connection() as conn:
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
+            categories = await self.expense_cat_repo.get_categories_by_user(conn, user)
+            category_string_list = [cat.category_name for cat in categories]
+        if (upd.text in category_string_list):
+            payload.category_name = upd.text
+            self.user_cache.update(upd.telegram_id, payload)
+            return Message.CATEGORY_SET
+        else:
+            raise ValueError("Такой категории нет")
 
+    @validate_date
     async def set_date(self, upd: Update) -> Message:
         """Метод, устанавливающий дату для временного Expense
         для пользователя с заданным telegram_id
         """
         payload = self.user_cache.get(upd.telegram_id)
-        payload.date = datetime(*upd.text.split(DATETIME_SPLIT_CHAR))
+        payload.date = datetime.strptime(upd.text, '%d-%m-%Y')
         self.user_cache.update(upd.telegram_id, payload)
         return Message.DATE_SET
 
+    @validate_number
     async def set_value(self, upd: Update) -> Message:
         """Метод, устанавливающий размер временного Expense
         для пользователя с заданным telegram_id
@@ -65,7 +82,7 @@ class ExpenseServiceImpl(Service):
         payload = self.user_cache.get(upd.telegram_id)
         payload.value = Decimal(upd.text)
         self.user_cache.update(upd.telegram_id, payload)
-        return Message.VALUE_SET
+        return Message.VALUE_SET + "\n" + payload.to_string() + "\n" + Message.ADD_VALUE_MESSAGE
 
     async def save(self, upd: Update) -> Message:
         """Метод, сохраняющий временный Expense в базу данных

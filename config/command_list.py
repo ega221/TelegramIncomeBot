@@ -8,8 +8,6 @@ class CommandsEnum(StrEnum):
 
     make_income = "/make_income"
     make_expense = "/make_expense"
-    get_income_categories = "/get_income_categories"
-    get_expense_categories = "/get_expense_categories"
     start = "/start"
     cancel = "/cancel"
 

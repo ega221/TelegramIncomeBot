@@ -9,7 +9,7 @@ from repository.interface import ExpenseRepository
 
 class ExpenseRepositoryImpl(ExpenseRepository):
     async def save(self, conn: connection, expense: Expense):
-        result = await conn.execute(
+        result = await conn.fetchrow(
             """
             INSERT INTO expenses(user_id, category_id, value, date) 
             VALUES($1, $2, $3, $4) RETURNING id

@@ -4,7 +4,7 @@ import asyncio
 
 from client.client import TgClient
 from dispatcher.dispatcher import Dispatcher
-from model.response_templates import Update
+from model.tg_update import Update
 
 
 async def delay(delay_seconds: int, message: str) -> int:
@@ -32,16 +32,11 @@ class Worker:
 
     async def _do_task(self, upd: Update) -> None:
         """Метод, который передает информацию апдейта в другие серсивы"""
-        task = asyncio.create_task(delay(1, upd.text))
-        await task
-
-        # Отдаем update Диспетчеру
-        task_upd = asyncio.create_task(self.dispatcher.update(upd))
-        res = await task_upd
+        res = await asyncio.create_task(self.dispatcher.update(upd))
 
         # После получения ответа диспетчета отправляем его обратно в чат
         task_send = asyncio.create_task(
-            self.tg_client.send_message(res.chat_id, res.text)
+            self.tg_client.send_message(res.telegram_id, res.text)
         )
         await task_send
         self.queue.task_done()
@@ -58,6 +53,5 @@ class Worker:
 
     async def stop(self):
         """Метод, который останавливает воркер и прекращает задачу"""
-        # await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
         await asyncio.gather(self.queue.join())
         self._task.cancel()

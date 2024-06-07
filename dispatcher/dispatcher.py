@@ -1,73 +1,89 @@
 # """Модуль с реализацией диспетчера"""
 
-# import asyncio
+import asyncio
+import sys
+import traceback
 
-# from config.command_list import CommandsEnum
-# from config.status_list import StatusEnum
-# from model.response_templates import Update
+from config.command_list import CommandsEnum
+from config.inner import Inner
+from config.state_list import StateEnum
+from model.messages import Message
+from model.tg_update import Update
+from services.interface import Service, UserService
+from state_machine.state_machine import StateMachine
+from user_cache.interface import UserCache
 
 
-# class Dispatcher:
-#     """Класс - диспетчер, который принимает update из tg,
-#     спрашивает у state машины где находится конкретный пользователь
-#     и вызывает нужный серсив
-#     """
+class Dispatcher:
+    """Класс - диспетчер, который принимает update из tg,
+    спрашивает у state машины где находится конкретный пользователь
+    и вызывает нужный серсив
+    """
 
-#     def __init__(self) -> None:
-#         # TODO: Добавить машину
-#         self.state_machine = None
+    def __init__(
+        self,
+        income_service: Service,
+        expense_service: Service,
+        user_cache: UserCache,
+        user_service: UserService,
+        state_enum: StateEnum,
+        state_machine: StateMachine,
+    ) -> None:
+        self.state_machine = state_machine
+        self.income_service = income_service
+        self.expense_service = expense_service
+        self.user_service = user_service
+        self.user_cache = user_cache
+        self.state_enum = state_enum
 
-#     async def update(self, upd):
-#         """Метод, который обращается к state machine
-#         и перенаправляет update в соответствующий сервис
-#         """
-#         # state = self.state_machine.get_status(upd["chat_id"])
-#         result = upd
-
-#         # try:
-#         #     # Если статус = начальный и сообщение является командой
-#         #     if (state.status == StatusEnum.idle) and (
-#         #         upd.message in Commands.get_commands()
-#         #     ):
-#         #         # Вызывается метод, инициализирующий нужный по команде сервис
-#         #         if upd.message == Commands.cansel:
-#         #             # TODO: Возвращаем все состояние
-#         #             pass
-#         #         elif upd.message == Commands.start:
-#         #             # TODO: Вызвать метод "start"
-#         #             pass
-#         #         else:
-#         #             # Иначе инициализируется работа сервиса
-#         #             service = self.get_service_by_command(upd.message)
-#         #             task = asyncio.create_task(service.initiate(upd["chat_id"]))
-#         #             result = await task
-#         #     else:
-#         #         # Иначе вызывается просто продолжения методов из сервисов
-#         #         task = asyncio.create_task(self.to_service(state, upd))
-#         #         result = await task
-#         # except Exception as e:
-#         #     result = e
-
-#         return Update(chat_id=upd.chat_id, text=result.text, update_id=upd.update_id)
-
-#     @staticmethod
-#     async def to_service(state, upd):
-#         """Отправка update в нужный сервис"""
-#         task = asyncio.create_task(state.func(upd))
-#         result = await task
-
-#         return result
-
-#     # @staticmethod
-#     # async def get_service_by_command(command: str):
-#     #     """Возвращает сервис, который необходимо инициализировать"""
-#     #     income_list = [CommandsEnum.make_income, CommandsEnum.get_income_categories]
-#     #     expense_list = [CommandsEnum.make_expense, CommandsEnum.get_expense_categories]
-
-#     #     # service = None
-#     #     # if command in income_list:
-#     #     #     service = IncomeService
-#     #     # elif command in expense_list:
-#     #     #     service = ExpenseService
-
-#     #     return service
+    async def update(self, upd: Update) -> Update:
+        """Метод, который обращается к state machine
+        и перенаправляет update в соответствующий сервис
+        """
+        state: Inner = self.state_machine.get_status(upd.telegram_id)
+        result = Update(telegram_id=upd.telegram_id, text="", update_id=upd.update_id)
+        message = Message.UNKNOWN_COMMAND
+        print("Текущее состояние:", state.value)
+        print("update:", upd)
+        try:
+            # Если статус = начальный и сообщение является командой /start
+            if (state.value == self.state_enum.idle.value) and (
+                upd.text == CommandsEnum.start
+            ):
+                await self.user_service.save(upd)
+                message = Message.GREETING
+                self.state_machine.set_status(upd.telegram_id)
+                self.state_machine.set_next_status(upd.telegram_id)
+            # Если статус = начальный и сообщение является командой /start
+            else:
+                if upd.text == CommandsEnum.cancel:
+                    print("cancel")
+                    self.user_cache.drop(upd.telegram_id)
+                    message = Message.CANCEL
+                    self.state_machine.set_choosing(upd.telegram_id)
+                elif upd.text in [CommandsEnum.make_income]:
+                    print("make income")
+                    self.state_machine.set_make_income(upd.telegram_id)
+                    task = asyncio.create_task(self.income_service.initiate(upd=upd))
+                    message = await task
+                    self.state_machine.set_next_status(upd.telegram_id)
+                elif upd.text in [CommandsEnum.make_expense]:
+                    print("make expense")
+                    self.state_machine.set_make_expense(upd.telegram_id)
+                    task = asyncio.create_task(self.expense_service.initiate(upd=upd))
+                    message = await task
+                    self.state_machine.set_next_status(upd.telegram_id)
+                else:
+                    print("other func")
+                    if state.func:
+                        task = asyncio.create_task(state.func(upd=upd))
+                        message = await task
+                        self.state_machine.set_next_status(upd.telegram_id)
+        except ValueError as e:
+            message = str(e)
+        except Exception as e:
+            traceback.print_exc(file=sys.stdout)
+            print(e)
+            message = e
+        result.text = message
+        return result

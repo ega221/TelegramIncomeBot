@@ -1,8 +1,8 @@
 """Модуль, реализующий интерфейс сервиса"""
 
-from model.response_templates import Update
-from model.user import User
 from model.messages import Message
+from model.tg_update import Update
+from model.user import User
 
 
 class Service:
