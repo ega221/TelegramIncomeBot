@@ -6,11 +6,8 @@ from config.command_list import CommandsEnum
 from config.status_list import StatusEnum
 from model.messages import Message
 from model.tg_update import Update
-from services.expense_service.expense_service_impl import ExpenseServiceImpl
-from services.income_service.income_service_impl import IncomeServiceImpl
-from services.interface import Service
-from services.user_service.user_service_impl import UserServiceImpl
-from user_cache.cache.user_cache_impl import UserCacheImpl
+from services.interface import Service, UserService
+from user_cache.interface import UserCache
 
 
 class Dispatcher:
@@ -21,10 +18,10 @@ class Dispatcher:
 
     def __init__(
         self,
-        income_service: IncomeServiceImpl,
-        expense_service: ExpenseServiceImpl,
-        user_cache: UserCacheImpl,
-        user_service: UserServiceImpl,
+        income_service: Service,
+        expense_service: Service,
+        user_cache: UserCache,
+        user_service: UserService,
     ) -> None:
         self.state_machine = None
         self.income_service = income_service
