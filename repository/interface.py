@@ -17,6 +17,9 @@ class UserRepository(Protocol):
     async def get_user_by_id(self, conn: SupportedConnection, user_id: int) -> User:
         pass
 
+    async def get_user_by_telegram_id(self, conn: connection, update_id: int) -> User:
+        pass
+
     async def delete_user_by_id(self, conn: SupportedConnection, user_id: int):
         pass
 
