@@ -82,11 +82,12 @@ class Dispatcher:
                         self.state_machine.set_next_status(upd.telegram_id)
         except ValueError as e:
             message = str(e)
-        except BaseAppException as e:
+        except BaseAppException:
             message = "Произошла ошибка :(\nПопробуйте снова"
+            self.user_cache.drop(upd.telegram_id)
+            self.state_machine.set_choosing(upd.telegram_id)
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             print(e)
-            message = e
         result.text = message
         return result
