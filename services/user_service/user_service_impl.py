@@ -1,15 +1,17 @@
 """Модуль, реализующий пользовательский сервис"""
 
-from model.user import User
-from model.response_templates import Update
 from model.messages import Message
-from services.interface import Service
+from model.tg_update import Update
+from model.user import User
 from repository.interface import UserRepository
+from services.interface import UserService
 from transaction.transaction_manager import TransactionManager
 
 
-class UserServiceImpl(Service):
-    def __init__(self, transaction_manager: TransactionManager, user_repo: UserRepository):
+class UserServiceImpl(UserService):
+    def __init__(
+        self, transaction_manager: TransactionManager, user_repo: UserRepository
+    ):
         self.transaction_manager = transaction_manager
         self.user_repo = user_repo
 
