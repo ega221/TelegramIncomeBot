@@ -25,7 +25,6 @@ async def create_pool():
 async def run():
     """Метод для запуска бота."""
     loop = asyncio.get_event_loop()
-
     bot = Bot(
         token=os.getenv("API_TOKEN"),
         queue_maxsize=int(os.getenv("QUEUE_MAX_SIZE")),
@@ -36,7 +35,7 @@ async def run():
 
     try:
         print("bot has been started")
-        loop.create_task(bot.start())
+        await loop.create_task(bot.start())
         loop.run_forever()
     except KeyboardInterrupt:
         print("\nstopping", datetime.datetime.now())
