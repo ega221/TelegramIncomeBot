@@ -26,13 +26,14 @@ from services.income_service.income_service_impl import IncomeServiceImpl
 from services.user_service.user_service_impl import UserServiceImpl
 from state_machine.state_machine import StateMachine
 from transaction.pg.transaction_manager_impl import TransactionManagerImpl
-from user_cache.cache.user_cache_impl import UserCache, UserCacheImpl
+from user_cache.cache.user_cache_impl import UserCacheImpl
 
 nest_asyncio.apply()
 load_dotenv()
 
 
 async def create_pool():
+    """Создает poll подключения к БД"""
     return await asyncpg.create_pool(
         database=os.getenv("POSTGRES_DB"),
         user=os.getenv("POSTGRES_USER"),
@@ -46,57 +47,57 @@ async def run():
     """Метод для запуска бота."""
     loop = asyncio.get_event_loop()
     # Кэш
-    Cache = UserCacheImpl()
+    cache = UserCacheImpl()
 
     # Для БД
     connection_pool = await create_pool()
-    TransactionManager = TransactionManagerImpl(connection_pool=connection_pool)
+    transaction_manager = TransactionManagerImpl(connection_pool=connection_pool)
 
     # Все репозитории
-    UserRepo = UserRepositoryImpl()
-    IncomeRepository = IncomeRepositoryImpl()
-    ExpenseRepository = ExpenseRepositoryImpl()
-    IncomeCategoryRepository = IncomeCategoryRepositoryImpl()
-    ExpenseCategoryRepository = ExpenseCategoryRepositoryImpl()
+    user_repo = UserRepositoryImpl()
+    income_repository = IncomeRepositoryImpl()
+    expense_repository = ExpenseRepositoryImpl()
+    income_category_repository = IncomeCategoryRepositoryImpl()
+    expense_category_repository = ExpenseCategoryRepositoryImpl()
 
     # Сервисы
-    IncomeService = IncomeServiceImpl(
-        user_cache=Cache,
-        transaction_manager=TransactionManager,
-        user_repo=UserRepo,
-        income_cat_repo=IncomeCategoryRepository,
-        income_repo=IncomeRepository,
+    income_service = IncomeServiceImpl(
+        user_cache=cache,
+        transaction_manager=transaction_manager,
+        user_repo=user_repo,
+        income_cat_repo=income_category_repository,
+        income_repo=income_repository,
     )
-    ExpenseService = ExpenseServiceImpl(
-        user_cache=Cache,
-        transaction_manager=TransactionManager,
-        user_repo=UserRepo,
-        expense_cat_repo=ExpenseCategoryRepository,
-        expense_repo=ExpenseRepository,
+    expense_service = ExpenseServiceImpl(
+        user_cache=cache,
+        transaction_manager=transaction_manager,
+        user_repo=user_repo,
+        expense_cat_repo=expense_category_repository,
+        expense_repo=expense_repository,
     )
-    UserService = UserServiceImpl(
-        transaction_manager=TransactionManager,
-        user_repo=UserRepo,
+    user_service = UserServiceImpl(
+        transaction_manager=transaction_manager,
+        user_repo=user_repo,
     )
-    State_Enum = StateEnum(
-        income_service=IncomeService,
-        expense_service=ExpenseService,
-        user_service=UserService,
-        Inner_object=Inner,
+    state_enum = StateEnum(
+        income_service=income_service,
+        expense_service=expense_service,
+        user_service=user_service,
+        inner_object=Inner,
     )
-    State_Machine = StateMachine(
-        income_service=IncomeService,
-        expense_service=ExpenseService,
-        user_service=UserService,
-        state_enum=State_Enum,
+    state_machine = StateMachine(
+        income_service=income_service,
+        expense_service=expense_service,
+        user_service=user_service,
+        state_enum=state_enum,
     )
     dispatcher = Dispatcher(
-        income_service=IncomeService,
-        expense_service=ExpenseService,
-        user_service=UserService,
-        user_cache=Cache,
-        state_enum=State_Enum,
-        state_machine=State_Machine,
+        income_service=income_service,
+        expense_service=expense_service,
+        user_service=user_service,
+        user_cache=cache,
+        state_enum=state_enum,
+        state_machine=state_machine,
     )
     bot = Bot(
         token=os.getenv("API_TOKEN"),

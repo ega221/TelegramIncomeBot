@@ -32,13 +32,6 @@ class Worker:
 
     async def _do_task(self, upd: Update) -> None:
         """Метод, который передает информацию апдейта в другие серсивы"""
-        # task = asyncio.create_task(delay(1, upd.text))
-        # await task
-
-        # Отдаем update Диспетчеру
-        # task_upd = asyncio.create_task(self.dispatcher.update(upd))
-        # res = await task_upd
-
         res = await asyncio.create_task(self.dispatcher.update(upd))
 
         # После получения ответа диспетчета отправляем его обратно в чат

@@ -18,7 +18,7 @@ class Bot:
         queue_timeout: int,
         update_timeout: int,
         tg_api_url: str,
-        dispatcher: Dispatcher
+        dispatcher: Dispatcher,
     ):
         self.tg_client = TgClient(token, tg_api_url)
         self.queue = asyncio.Queue(maxsize=queue_maxsize)

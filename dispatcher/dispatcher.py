@@ -1,8 +1,9 @@
 # """Модуль с реализацией диспетчера"""
 
 import asyncio
-import traceback
 import sys
+import traceback
+
 from config.command_list import CommandsEnum
 from config.inner import Inner
 from config.state_list import StateEnum
@@ -39,9 +40,7 @@ class Dispatcher:
         """Метод, который обращается к state machine
         и перенаправляет update в соответствующий сервис
         """
-        # print("vova")
         state: Inner = self.state_machine.get_status(upd.telegram_id)
-        # print("jopa")
         result = Update(telegram_id=upd.telegram_id, text="", update_id=upd.update_id)
         message = Message.UNKNOWN_COMMAND
         print("Текущее состояние:", state.value)
@@ -83,7 +82,6 @@ class Dispatcher:
         except ValueError as e:
             message = str(e)
         except Exception as e:
-            # TODO: Отлавливать какие-то конкретные исключения
             traceback.print_exc(file=sys.stdout)
             print(e)
             message = e
