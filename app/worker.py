@@ -4,7 +4,7 @@ import asyncio
 
 from client.client import TgClient
 from dispatcher.dispatcher import Dispatcher
-from model.response_templates import Update
+from model.tg_update import Update
 
 
 async def delay(delay_seconds: int, message: str) -> int:
@@ -58,6 +58,5 @@ class Worker:
 
     async def stop(self):
         """Метод, который останавливает воркер и прекращает задачу"""
-        # await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
         await asyncio.gather(self.queue.join())
         self._task.cancel()

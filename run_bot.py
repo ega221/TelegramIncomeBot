@@ -1,12 +1,15 @@
 """Pylint просит докстринг к импортам"""
 
 import asyncio
-import asyncpg
 import datetime
 import os
+
+import asyncpg
 import nest_asyncio
 from dotenv import load_dotenv
+
 from app.bot import Bot
+from dispatcher.dispatcher import Dispatcher
 
 nest_asyncio.apply()
 load_dotenv()
@@ -31,6 +34,9 @@ async def run():
         queue_timeout=int(os.getenv("QUEUE_TIMEOUT")),
         update_timeout=int(os.getenv("UPDATES_TIMEOUT")),
         tg_api_url=os.getenv("TG_URL"),
+        dispetcher=Dispatcher(
+            income_service=None, expense_service=None, user_cache=None
+        ),
     )
 
     try:
