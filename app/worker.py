@@ -1,7 +1,10 @@
 """Pylint просит докстринг к импортам"""
 
 import asyncio
+
 from client.client import TgClient
+from dispatcher.dispatcher import Dispatcher
+from model.response_templates import Update
 
 
 async def delay(delay_seconds: int, message: str) -> int:
@@ -14,21 +17,34 @@ async def delay(delay_seconds: int, message: str) -> int:
 class Worker:
     """Обработка задач из очереди"""
 
-    def __init__(self, queue: asyncio.Queue, tg_client: TgClient, queue_timeout: int = 60):
+    def __init__(
+        self,
+        queue: asyncio.Queue,
+        tg_client: TgClient,
+        dispatcher: Dispatcher,
+        queue_timeout: int = 60,
+    ):
         self.queue_timeout = queue_timeout
         self.tg_client = tg_client
         self.queue = queue
         self._task: asyncio.Task = None
+        self.dispatcher = dispatcher
 
-    async def _do_task(self, upd):
+    async def _do_task(self, upd: Update) -> None:
         """Метод, который передает информацию апдейта в другие серсивы"""
-        try:
-            task = asyncio.create_task(delay(3, upd["message"]["text"]))
-            await task
-            # if upd['message']['text'] == '/test':
-            # await self.tg_client.send_message(upd['message']['chat']['id'], 'Привет!\nЯ Бобот.\nЯ научился обрабатывать одну команду!')
-        finally:
-            self.queue.task_done()
+        task = asyncio.create_task(delay(1, upd.text))
+        await task
+
+        # Отдаем update Диспетчеру
+        task_upd = asyncio.create_task(self.dispatcher.update(upd))
+        res = await task_upd
+
+        # После получения ответа диспетчета отправляем его обратно в чат
+        task_send = asyncio.create_task(
+            self.tg_client.send_message(res.chat_id, res.text)
+        )
+        await task_send
+        self.queue.task_done()
 
     async def _worker(self):
         """Работяга, который достает апдейты из очереди и запускает асинхронную задачу"""
@@ -42,7 +58,6 @@ class Worker:
 
     async def stop(self):
         """Метод, который останавливает воркер и прекращает задачу"""
-        try:
-            await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
-        finally:
-            self._task.cancel()
+        # await asyncio.wait_for(self.queue.join(), timeout=self.queue_timeout)
+        await asyncio.gather(self.queue.join())
+        self._task.cancel()
