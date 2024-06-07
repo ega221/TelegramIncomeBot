@@ -3,7 +3,7 @@
 import asyncio
 
 from config.command_list import CommandsEnum
-from config.status_list import StatusEnum
+from config.state_list import StateEnum
 from model.messages import Message
 from model.tg_update import Update
 from services.interface import Service, UserService
@@ -33,12 +33,12 @@ class Dispatcher:
         """Метод, который обращается к state machine
         и перенаправляет update в соответствующий сервис
         """
-        state = self.state_machine.get_status(upd.telegram_id)
+        state = self.state_machine.get_state(upd.telegram_id)
         result = Update(telegram_id=upd.telegram_id, text="", update_id=upd.update_id)
         message = Message.UNKNOWN_COMMAND
         try:
             # Если статус = начальный и сообщение является командой /start
-            if (state.status == StatusEnum.idle) and (
+            if (state.status == StateEnum.idle) and (
                 upd.message == CommandsEnum.start
             ):
                 self.user_service.save(upd)
