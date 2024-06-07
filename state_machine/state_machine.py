@@ -17,11 +17,15 @@ class StateMachine:
         self.user_service = user_service
         self.state_enum = state_enum
 
+    def set_status(self, telegram_id: str):
+        self.hash_map[telegram_id] = self.state_enum.idle
+
     def get_status(self, telegram_id: str) -> StateEnum:
         return self.hash_map.get(telegram_id, self.state_enum.idle)
 
     def set_next_status(self, telegram_id: str):
         current_state = self.hash_map.get(telegram_id)
+        print(current_state)
         self.hash_map[telegram_id] = current_state.nxt
 
     def get_func(self, telegram_id: str) -> callable:

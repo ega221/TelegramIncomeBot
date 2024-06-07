@@ -23,7 +23,7 @@ class UserServiceImpl(UserService):
     async def save(self, upd: Update) -> Message:
         """Метод, сохраняющий пользователя в базе данных"""
         async with self.transaction_manager.get_connection() as conn:
-            user = self.user_repo.get_user_by_telegram_id(conn, upd.update_id)
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.update_id)
             if not user:
                 await self.user_repo.save(conn, User(upd.update_id))
         return Message.GREETING

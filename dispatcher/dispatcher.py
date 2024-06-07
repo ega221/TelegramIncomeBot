@@ -38,18 +38,25 @@ class Dispatcher:
         """Метод, который обращается к state machine
         и перенаправляет update в соответствующий сервис
         """
+        # print("vova")
         state: Inner = self.state_machine.get_status(upd.telegram_id)
-
+        # print("jopa")
         result = Update(telegram_id=upd.telegram_id, text="", update_id=upd.update_id)
         message = Message.UNKNOWN_COMMAND
-
+        print(state.value)
+        print(self.state_enum.idle.value)
+        print(upd.text)
+        print(CommandsEnum.start)
         try:
             # Если статус = начальный и сообщение является командой /start
-            if (state.status == self.state_enum.idle) and (
-                upd.message == CommandsEnum.start
+            if (state.value == self.state_enum.idle.value) and (
+                upd.text == CommandsEnum.start
             ):
-                self.user_service.save(upd)
+                print("Aboba")
+                await self.user_service.save(upd)
                 message = Message.GREETING
+                print("biba")
+                self.state_machine.set_status(upd.telegram_id)
                 self.state_machine.set_next_status(upd.telegram_id)
             # Если статус = начальный и сообщение является командой /start
             else:
@@ -68,6 +75,7 @@ class Dispatcher:
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)
                 else:
+                    print("1")
                     task = asyncio.create_task(state.func(upd))
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)

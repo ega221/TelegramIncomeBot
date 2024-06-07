@@ -78,7 +78,7 @@ async def run():
         transaction_manager=TransactionManager,
         user_repo=UserRepo,
     )
-    StatEnum = StateEnum(
+    State_Enum = StateEnum(
         income_service=IncomeService,
         expense_service=ExpenseService,
         user_service=UserService,
@@ -88,14 +88,14 @@ async def run():
         income_service=IncomeService,
         expense_service=ExpenseService,
         user_service=UserService,
-        state_enum=StatEnum,
+        state_enum=State_Enum,
     )
     dispatcher = Dispatcher(
         income_service=IncomeService,
         expense_service=ExpenseService,
         user_service=UserService,
         user_cache=Cache,
-        state_enum=StatEnum,
+        state_enum=State_Enum,
         state_machine=State_Machine,
     )
     bot = Bot(

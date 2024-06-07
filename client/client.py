@@ -37,7 +37,6 @@ class TgClient:
                 res_dict = await task
 
         res_dict = res_dict["result"][0]
-
         return Update(
             telegram_id=res_dict["message"]["chat"]["id"],
             text=res_dict["message"]["text"],

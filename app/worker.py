@@ -36,7 +36,8 @@ class Worker:
         # await task
 
         # Отдаем update Диспетчеру
-        res = await asyncio.create_task(self.dispatcher.update(upd))
+        task_upd = asyncio.create_task(self.dispatcher.update(upd))
+        res = await task_upd
 
         # После получения ответа диспетчета отправляем его обратно в чат
         task_send = asyncio.create_task(
