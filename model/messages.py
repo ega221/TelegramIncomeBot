@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class Message(Enum):
+class Message(StrEnum):
     GREETING = "Доброго времени суток это бот"
     INITIATE_INCOME = "Выберите категорию доходов"
     INITIATE_EXPENSE = "Выберите категорию расходов"

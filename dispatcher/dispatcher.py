@@ -25,7 +25,7 @@ class Dispatcher:
         user_cache: UserCache,
         user_service: UserService,
         state_enum: StateEnum,
-        state_machine: StateMachine
+        state_machine: StateMachine,
     ) -> None:
         self.state_machine = state_machine
         self.income_service = income_service
@@ -43,42 +43,42 @@ class Dispatcher:
         # print("jopa")
         result = Update(telegram_id=upd.telegram_id, text="", update_id=upd.update_id)
         message = Message.UNKNOWN_COMMAND
-        print(state.value)
-        print(self.state_enum.idle.value)
-        print(upd.text)
-        print(CommandsEnum.start)
+        print("Текущее состояние:", state.value)
+        print("update:", upd)
         try:
             # Если статус = начальный и сообщение является командой /start
             if (state.value == self.state_enum.idle.value) and (
                 upd.text == CommandsEnum.start
             ):
-                print("Aboba")
                 await self.user_service.save(upd)
                 message = Message.GREETING
-                print("biba")
                 self.state_machine.set_status(upd.telegram_id)
                 self.state_machine.set_next_status(upd.telegram_id)
             # Если статус = начальный и сообщение является командой /start
             else:
                 if upd.text == CommandsEnum.cancel:
+                    print("cancel")
                     self.user_cache.drop(upd.telegram_id)
                     message = Message.CANCEL
                     self.state_machine.set_choosing(upd.telegram_id)
                 elif upd.text in [CommandsEnum.make_income]:
+                    print("make income")
                     self.state_machine.set_make_expense(upd.telegram_id)
                     task = asyncio.create_task(self.income_service.initiate(upd))
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)
                 elif upd.text in [CommandsEnum.make_expense]:
+                    print("make expense")
                     self.state_machine.set_make_expense(upd.telegram_id)
                     task = asyncio.create_task(self.expense_service.initiate(upd))
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)
                 else:
-                    print("1")
-                    task = asyncio.create_task(state.func(upd))
-                    message = await task
-                    self.state_machine.set_next_status(upd.telegram_id)
+                    print("other func")
+                    if state.func:
+                        task = asyncio.create_task(state.func(upd))
+                        message = await task
+                        self.state_machine.set_next_status(upd.telegram_id)
         except Exception as e:
             # TODO: Отлавливать какие-то конкретные исключения
             print(e)
