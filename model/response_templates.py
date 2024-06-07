@@ -7,6 +7,6 @@ from dataclasses import dataclass
 class Update:
     """Класс, соответствующий tg update"""
 
-    chat_id: int
+    telegram_id: int
     text: str
     update_id: int
