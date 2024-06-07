@@ -1,15 +1,20 @@
 """Модуль, реализующий сервис расходов"""
 
-from model.expense import Expense
-from model.response_templates import Update
-from model.messages import Message
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
+
+from model.expense import Expense
+from model.messages import Message
+from model.response_templates import Update
 from model.transient_expense import TransientExpense
+from repository.interface import (
+    ExpenseCategoryRepository,
+    ExpenseRepository,
+    UserRepository,
+)
 from services.interface import Service
-from repository.interface import UserRepository, ExpenseCategoryRepository, ExpenseRepository
-from user_cache.interface import UserCache
 from transaction.transaction_manager import TransactionManager
+from user_cache.interface import UserCache
 
 DATETIME_SPLIT_CHAR = "-"
 
@@ -74,7 +79,7 @@ class ExpenseServiceImpl(Service):
             category_id = next((cat.id for cat in user_categories if cat.category_name == payload.category_name), None)
             value = payload.value
             date = payload.date
-            expense = await self.expense_repo.save(conn, Expense(user.id, category_id, value, date))
+            await self.expense_repo.save(conn, Expense(user.id, category_id, value, date))
         await self.drop(upd)
         return Message.EXPENSE_SAVED
 

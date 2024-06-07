@@ -74,7 +74,7 @@ class IncomeServiceImpl(Service):
             category_id = next((cat.id for cat in user_categories if cat.category_name == payload.category_name), None)
             value = payload.value
             date = payload.date
-            income = await self.expense_repo.save(conn, Income(user.id, category_id, value, date))
+            await self.expense_repo.save(conn, Income(user.id, category_id, value, date))
         await self.drop(upd)
         return Message.INCOME_SAVED
 
