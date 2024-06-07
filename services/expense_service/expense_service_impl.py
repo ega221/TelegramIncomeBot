@@ -54,7 +54,7 @@ class ExpenseServiceImpl(Service):
         для пользователя с заданным telegram_id
         """
         payload = self.user_cache.get(upd.telegram_id)
-        payload.date = datetime(*upd.text.split(DATETIME_SPLIT_CHAR))
+        payload.date = datetime.strptime(upd.text, '%d-%m-%Y')
         self.user_cache.update(upd.telegram_id, payload)
         return Message.DATE_SET
 

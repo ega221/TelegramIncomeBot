@@ -32,7 +32,9 @@ class IncomeServiceImpl(Service):
     async def initiate(self, upd: Update) -> Message:
         """Метод, инициализирующий временный Income в кэше"""
         payload = TransientIncome(telegram_id=upd.telegram_id)
+        print("print payload in initiate method: " + str(payload))
         self.user_cache.update(upd.telegram_id, payload)
+        print(self.user_cache.hash_map)
         return Message.INITIATE_INCOME
 
     async def set_category(self, upd: Update) -> Message:
@@ -40,6 +42,8 @@ class IncomeServiceImpl(Service):
         telegram_id нужную категорию
         """
         payload = self.user_cache.get(upd.telegram_id)
+        print(self.user_cache.hash_map)
+        print("Print payload in  method" + str(payload))
         payload.category_name = upd.text
         self.user_cache.update(upd.telegram_id, payload)
         return Message.CATEGORY_SET
@@ -49,7 +53,7 @@ class IncomeServiceImpl(Service):
         для пользователя с заданным telegram_id
         """
         payload = self.user_cache.get(upd.telegram_id)
-        payload.date = datetime(*upd.text.split(DATETIME_SPLIT_CHAR))
+        payload.date = datetime.strptime(upd.text, '%d-%m-%Y')
         self.user_cache.update(upd.telegram_id, payload)
         return Message.DATE_SET
 

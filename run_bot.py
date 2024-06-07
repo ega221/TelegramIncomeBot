@@ -26,7 +26,7 @@ from services.income_service.income_service_impl import IncomeServiceImpl
 from services.user_service.user_service_impl import UserServiceImpl
 from state_machine.state_machine import StateMachine
 from transaction.pg.transaction_manager_impl import TransactionManagerImpl
-from user_cache.cache.user_cache_impl import UserCache
+from user_cache.cache.user_cache_impl import UserCache, UserCacheImpl
 
 nest_asyncio.apply()
 load_dotenv()
@@ -46,7 +46,7 @@ async def run():
     """Метод для запуска бота."""
     loop = asyncio.get_event_loop()
     # Кэш
-    Cache = UserCache()
+    Cache = UserCacheImpl()
 
     # Для БД
     connection_pool = await create_pool()

@@ -24,13 +24,15 @@ class StateEnum:
         self.choosing = self.Inner_object("CHOOSING", None, None)
 
         # EXPENSE
-        self.setting_expense_value = self.Inner_object("SETTING_EXPENSE_VALUE", self.choosing, self.expense_service.set_value)
+        self.save_expense = self.Inner_object("SAVING_EXPENSE", self.choosing, self.expense_service.save)
+        self.setting_expense_value = self.Inner_object("SETTING_EXPENSE_VALUE", self.save_expense, self.expense_service.set_value)
         self.setting_expense_date = self.Inner_object("SETTING_EXPENSE_DATE", self.setting_expense_value, self.expense_service.set_date)
         self.setting_expense_category = self.Inner_object("SETTING_EXPENSE_CATEGORY", self.setting_expense_date, self.expense_service.set_category)
         self.init_expense = self.Inner_object("INIT_EXPENSE", self.setting_expense_category, self.expense_service.initiate)
 
         # INCOME
-        self.setting_income_value = self.Inner_object("SETTING_INCOME_VALUE", self.choosing, self.income_service.set_value)
+        self.save_income = self.Inner_object("SAVING_INCOME", self.choosing, self.income_service.save)
+        self.setting_income_value = self.Inner_object("SETTING_INCOME_VALUE", self.save_income, self.income_service.set_value)
         self.setting_income_date = self.Inner_object("SETTING_INCOME_DATE", self.setting_income_value, self.income_service.set_date)
         self.setting_income_category = self.Inner_object("SETTING_INCOME_CATEGORY", self.setting_income_date, self.income_service.set_category)
         self.init_income = self.Inner_object("INIT_INCOME", self.setting_income_category, self.income_service.initiate)

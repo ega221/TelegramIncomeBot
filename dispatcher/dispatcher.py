@@ -1,7 +1,8 @@
 # """Модуль с реализацией диспетчера"""
 
 import asyncio
-
+import traceback
+import sys
 from config.command_list import CommandsEnum
 from config.inner import Inner
 from config.state_list import StateEnum
@@ -63,7 +64,7 @@ class Dispatcher:
                     self.state_machine.set_choosing(upd.telegram_id)
                 elif upd.text in [CommandsEnum.make_income]:
                     print("make income")
-                    self.state_machine.set_make_expense(upd.telegram_id)
+                    self.state_machine.set_make_income(upd.telegram_id)
                     task = asyncio.create_task(self.income_service.initiate(upd))
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)
@@ -81,6 +82,7 @@ class Dispatcher:
                         self.state_machine.set_next_status(upd.telegram_id)
         except Exception as e:
             # TODO: Отлавливать какие-то конкретные исключения
+            traceback.print_exc(file=sys.stdout)
             print(e)
         result.text = message
         return result
