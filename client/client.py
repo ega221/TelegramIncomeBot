@@ -39,7 +39,7 @@ class TgClient:
         res_dict = res_dict["result"][0]
 
         return Update(
-            chat_id=res_dict["message"]["chat"]["id"],
+            telegram_id=res_dict["message"]["chat"]["id"],
             text=res_dict["message"]["text"],
             update_id=res_dict["update_id"],
         )

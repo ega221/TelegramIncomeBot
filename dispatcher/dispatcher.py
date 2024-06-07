@@ -32,8 +32,8 @@ class Dispatcher:
         """Метод, который обращается к state machine
         и перенаправляет update в соответствующий сервис
         """
-        state = self.state_machine.get_status(upd.chat_id)
-        result = Update(chat_id=upd.chat_id, text="", update_id=upd.update_id)
+        state = self.state_machine.get_status(upd.telegram_id)
+        result = Update(telegram_id=upd.telegram_id, text="", update_id=upd.update_id)
 
         try:
             # Если статус = начальный и сообщение является командой
@@ -43,7 +43,7 @@ class Dispatcher:
                 # Вызывается метод, инициализирующий нужный по команде сервис
                 if upd.text == CommandsEnum.cansel:
                     # TODO: Добавить ссылку на начальное сообщение
-                    self.user_cache.drop(upd.chat_id)
+                    self.user_cache.drop(upd.telegram_id)
                     message = "СООБЩЕНИЕ НАЧАЛЬНОЕ"
                 elif upd.message == CommandsEnum.start:
                     # TODO: Вызвать метод "save" из UserService
@@ -52,7 +52,7 @@ class Dispatcher:
                 else:
                     # Иначе инициализируется работа сервиса
                     service = self.get_service_by_command(upd.text)
-                    task = asyncio.create_task(service.initiate(upd.chat_id))
+                    task = asyncio.create_task(service.initiate(upd.telegram_id))
                     message = await task
             else:
                 # Иначе вызывается просто продолжения методов из сервисов
