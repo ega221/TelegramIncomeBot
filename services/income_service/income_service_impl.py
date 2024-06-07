@@ -43,6 +43,7 @@ class IncomeServiceImpl(Service):
             categories = await self.income_cat_repo.get_categories_by_user(conn, user)
             category_string = "\n".join([cat.category_name for cat in categories])
         return Message.INITIATE_INCOME + category_string
+
     @validate_category
     async def set_category(self, upd: Update = None) -> Message:
         """Метод, устанавливающий для пользователя с заданным
@@ -69,6 +70,7 @@ class IncomeServiceImpl(Service):
         payload.date = datetime.strptime(upd.text, '%d-%m-%Y')
         self.user_cache.update(upd.telegram_id, payload)
         return Message.DATE_SET
+
     @validate_number
     async def set_value(self, upd: Update = None) -> Message:
         """Метод, устанавливающий размер временного Income

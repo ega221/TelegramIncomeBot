@@ -64,7 +64,6 @@ class ExpenseServiceImpl(Service):
         else:
             raise ValueError("Такой категории нет")
 
-
     @validate_date
     async def set_date(self, upd: Update) -> Message:
         """Метод, устанавливающий дату для временного Expense
