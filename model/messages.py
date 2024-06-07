@@ -12,3 +12,5 @@ class Message(Enum):
     INCOME_DROPPED = "Доход сброшен"
     EXPENSE_SAVED = "Расход сохранен"
     EXPENSE_DROPPED = "Расход сброшен"
+    CANCEL = "Команда отменена"
+    UNKNOWN_COMMAND = "Неизвестная команда"
