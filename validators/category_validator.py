@@ -17,8 +17,8 @@ def validate_category(coroutine_func: Awaitable):
         """Асинхронная свертка для корутины"""
         if (
             not kwargs
-            or not isinstance(kwargs["category"], str)
-            or not is_string_with_letters(kwargs["category"])
+            or not isinstance(kwargs["upd"], str)
+            or not is_string_with_letters(kwargs["upd"].text)
         ):
             raise ValueError("Категория должна быть строкой, содержащей только буквы")
         task = asyncio.create_task(coroutine_func(*args, **kwargs))

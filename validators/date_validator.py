@@ -22,8 +22,8 @@ def validate_date(coroutine_func: Awaitable):
         """Асинхронная свертка для корутины"""
         if (
             not kwargs
-            or not isinstance(kwargs["date"], str)
-            or not is_date_string(kwargs["date"])
+            or not isinstance(kwargs["upd"], str)
+            or not is_date_string(kwargs["upd"].text)
         ):
             raise ValueError("Дата должна быть строкой в формате DD-MM-YYYY")
         task = asyncio.create_task(coroutine_func(*args, **kwargs))

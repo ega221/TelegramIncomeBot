@@ -21,8 +21,8 @@ def validate_number(coroutine_func: Awaitable):
         """Асинхронная свертка для корутины"""
         if (
             not kwargs
-            or not isinstance(kwargs["value"], str)
-            or not is_number(kwargs["value"])
+            or not isinstance(kwargs["upd"].text, str)
+            or not is_number(kwargs["upd"].text)
         ):
             raise ValueError("Значение должно быть формата 12345.67 или 12345")
         task = asyncio.create_task(coroutine_func(*args, **kwargs))
