@@ -4,6 +4,7 @@ import asyncio
 import sys
 import traceback
 
+from Exceptions.app_exceptions import BaseAppException
 from config.command_list import CommandsEnum
 from config.inner import Inner
 from config.state_list import StateEnum
@@ -81,6 +82,8 @@ class Dispatcher:
                         self.state_machine.set_next_status(upd.telegram_id)
         except ValueError as e:
             message = str(e)
+        except BaseAppException as e:
+            message = "Произошла ошибка :(\nПопробуйте снова"
         except Exception as e:
             traceback.print_exc(file=sys.stdout)
             print(e)
