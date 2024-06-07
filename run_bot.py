@@ -9,6 +9,8 @@ import nest_asyncio
 from dotenv import load_dotenv
 
 from app.bot import Bot
+from config.inner import Inner
+from config.state_list import StateEnum
 from dispatcher.dispatcher import Dispatcher
 from repository.expense_category_repository.expense_category_repository_impl import (
     ExpenseCategoryRepositoryImpl,
@@ -22,6 +24,7 @@ from repository.user_repository.user_repository_impl import UserRepositoryImpl
 from services.expense_service.expense_service_impl import ExpenseServiceImpl
 from services.income_service.income_service_impl import IncomeServiceImpl
 from services.user_service.user_service_impl import UserServiceImpl
+from state_machine.state_machine import StateMachine
 from transaction.pg.transaction_manager_impl import TransactionManagerImpl
 from user_cache.cache.user_cache_impl import UserCache
 
@@ -46,7 +49,7 @@ async def run():
     Cache = UserCache()
 
     # Для БД
-    connection_pool = create_pool()
+    connection_pool = await create_pool()
     TransactionManager = TransactionManagerImpl(connection_pool=connection_pool)
 
     # Все репозитории
@@ -75,11 +78,25 @@ async def run():
         transaction_manager=TransactionManager,
         user_repo=UserRepo,
     )
+    StatEnum = StateEnum(
+        income_service=IncomeService,
+        expense_service=ExpenseService,
+        user_service=UserService,
+        Inner_object=Inner,
+    )
+    State_Machine = StateMachine(
+        income_service=IncomeService,
+        expense_service=ExpenseService,
+        user_service=UserService,
+        state_enum=StatEnum,
+    )
     dispatcher = Dispatcher(
         income_service=IncomeService,
         expense_service=ExpenseService,
         user_service=UserService,
         user_cache=Cache,
+        state_enum=StatEnum,
+        state_machine=State_Machine,
     )
     bot = Bot(
         token=os.getenv("API_TOKEN"),

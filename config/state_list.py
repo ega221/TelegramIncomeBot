@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+from config.inner import Inner
 from services.interface import Service, UserService
 
 
@@ -11,34 +12,33 @@ class StateEnum:
     def __init__(self,
                  income_service: Service,
                  expense_service: Service,
-                 user_service: UserService):
+                 user_service: UserService,
+                 Inner_object: Inner):
+        
         self.income_service = income_service
         self.expense_service = expense_service
         self.user_service = user_service
+        self.Inner_object = Inner_object
+        
+        # CHOOSING (он изменяется динамически)
+        self.choosing = self.Inner_object("CHOOSING", None, None)
 
-        setting_expense_value = Inner("SETTING_EXPENSE_VALUE", None)
-        setting_expense_date = Inner("SETTING_EXPENSE_DATE", setting_expense_value, None)
-        setting_expense_category = Inner("SETTING_EXPENSE_CATEGORY", setting_expense_date, None)
-        setting_income_value = Inner("SETTING_INCOME_VALUE", None, None)
-        setting_income_date = Inner("SETTING_INCOME_DATE", setting_income_value, None)
-        setting_income_category = Inner("SETTING_INCOME_CATEGORY", setting_income_date, None)
-        idle = Inner("IDLE", None, None)
+        # EXPENSE
+        self.setting_expense_value = self.Inner_object("SETTING_EXPENSE_VALUE", self.choosing, self.expense_service.set_value)
+        self.setting_expense_date = self.Inner_object("SETTING_EXPENSE_DATE", self.setting_expense_value, self.expense_service.set_date)
+        self.setting_expense_category = self.Inner_object("SETTING_EXPENSE_CATEGORY", self.setting_expense_date, self.expense_service.set_category)
+        self.init_expense = self.Inner_object("INIT_EXPENSE", self.setting_expense_category, self.expense_service.initiate)
 
-    class Inner:
-        def __init__(self, value, nxt, func):
-            self.value = value
-            self.nxt = nxt
-            self.func = func
+        # INCOME
+        self.setting_income_value = self.Inner_object("SETTING_INCOME_VALUE", self.choosing, self.income_service.set_value)
+        self.setting_income_date = self.Inner_object("SETTING_INCOME_DATE", self.setting_income_value, self.income_service.set_date)
+        self.setting_income_category = self.Inner_object("SETTING_INCOME_CATEGORY", self.setting_income_date, self.income_service.set_category)
+        self.init_income = self.Inner_object("INIT_INCOME", self.setting_income_category, self.income_service.initiate)
 
-    """
-    idle = "IDLE"
-    setting_income_category = "SETTING_INCOME_CATEGORY"
-    setting_income_date = "SETTING_INCOME_DATE"
-    setting_income_value = "SETTING_INCOME_VALUE"
-    setting_expense_category = "SETTING_EXPENSE_CATEGORY"
-    setting_expense_date = "SETTING_EXPENSE_DATE"
-    setting_expense_value = "SETTING_EXPENSE_VALUE"
-    """
+        # IDLE
+        self.idle = self.Inner_object("IDLE", self.choosing, None)
+
+
 
     @classmethod
     def get_status(cls):
