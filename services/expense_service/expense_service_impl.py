@@ -41,7 +41,11 @@ class ExpenseServiceImpl(Service):
         """Метод, инициализирующий временный Expense в кэше"""
         payload = TransientExpense(telegram_id=upd.telegram_id)
         self.user_cache.update(upd.telegram_id, payload)
-        return Message.INITIATE_EXPENSE
+        async with self.transaction_manager.get_connection() as conn:
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
+            categories = await self.expense_cat_repo.get_categories_by_user(conn, user)
+            category_string = "\n".join([cat.category_name for cat in categories])
+        return Message.INITIATE_INCOME + category_string
 
     @validate_category
     async def set_category(self, upd: Update) -> Message:
@@ -49,9 +53,17 @@ class ExpenseServiceImpl(Service):
         telegram_id нужную категорию
         """
         payload = self.user_cache.get(upd.telegram_id)
-        payload.category_name = upd.text
-        self.user_cache.update(upd.telegram_id, payload)
-        return Message.CATEGORY_SET
+        async with self.transaction_manager.get_connection() as conn:
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
+            categories = await self.expense_cat_repo.get_categories_by_user(conn, user)
+            category_string_list = [cat.category_name for cat in categories]
+        if (upd.text in category_string_list):
+            payload.category_name = upd.text
+            self.user_cache.update(upd.telegram_id, payload)
+            return Message.CATEGORY_SET
+        else:
+            raise ValueError("Такой категории нет")
+
 
     @validate_date
     async def set_date(self, upd: Update) -> Message:

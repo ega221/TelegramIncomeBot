@@ -1,7 +1,7 @@
 """Модуль, реализующий сервис доходов"""
 
 from model.income import Income
-from model.response_templates import Update
+from model.tg_update import Update
 from model.messages import Message
 from decimal import Decimal
 from datetime import datetime
@@ -29,8 +29,8 @@ class IncomeServiceImpl(Service):
         self.user_cache = user_cache
         self.transaction_manager = transaction_manager
         self.user_repo = user_repo
-        self.expense_cat_repo = income_cat_repo
-        self.expense_repo = income_repo
+        self.income_cat_repo = income_cat_repo
+        self.income_repo = income_repo
 
     async def initiate(self, upd: Update = None) -> Message:
         """Метод, инициализирующий временный Income в кэше"""
@@ -38,18 +38,28 @@ class IncomeServiceImpl(Service):
         print("print payload in initiate method: " + str(payload))
         self.user_cache.update(upd.telegram_id, payload)
         print(self.user_cache.hash_map)
-        return Message.INITIATE_INCOME
+        async with self.transaction_manager.get_connection() as conn:
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
+            categories = await self.income_cat_repo.get_categories_by_user(conn, user)
+            category_string = "\n".join([cat.category_name for cat in categories])
+        return Message.INITIATE_INCOME + category_string
     @validate_category
     async def set_category(self, upd: Update = None) -> Message:
         """Метод, устанавливающий для пользователя с заданным
         telegram_id нужную категорию
         """
         payload = self.user_cache.get(upd.telegram_id)
-        print(self.user_cache.hash_map)
-        print("Print payload in  method" + str(payload))
-        payload.category_name = upd.text
-        self.user_cache.update(upd.telegram_id, payload)
-        return Message.CATEGORY_SET
+        async with self.transaction_manager.get_connection() as conn:
+            user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
+            categories = await self.income_cat_repo.get_categories_by_user(conn, user)
+            category_string_list = [cat.category_name for cat in categories]
+        if (upd.text in category_string_list):
+            payload.category_name = upd.text
+            self.user_cache.update(upd.telegram_id, payload)
+            return Message.CATEGORY_SET
+        else:
+            raise ValueError("Такой категории нет")
+
     @validate_date
     async def set_date(self, upd: Update = None) -> Message:
         """Метод, устанавливающий дату для временного Income
@@ -77,11 +87,11 @@ class IncomeServiceImpl(Service):
         payload = self.user_cache.get(upd.telegram_id)
         async with self.transaction_manager.get_connection() as conn:
             user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
-            user_categories = await self.expense_cat_repo.get_categories_by_user(conn, user)
+            user_categories = await self.income_cat_repo.get_categories_by_user(conn, user)
             category_id = next((cat.id for cat in user_categories if cat.category_name == payload.category_name), None)
             value = payload.value
             date = payload.date
-            await self.expense_repo.save(conn, Income(user.id, category_id, value, date))
+            await self.income_repo.save(conn, Income(user.id, category_id, value, date))
         await self.drop(upd)
         return Message.INCOME_SAVED
 
