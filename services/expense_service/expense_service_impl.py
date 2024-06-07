@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from model.expense import Expense
 from model.messages import Message
-from model.response_templates import Update
+from model.tg_update import Update
 from model.transient_expense import TransientExpense
 from repository.interface import (
     ExpenseCategoryRepository,
