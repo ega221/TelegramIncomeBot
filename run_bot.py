@@ -21,6 +21,7 @@ from repository.income_repository.income_repository_impl import IncomeRepository
 from repository.user_repository.user_repository_impl import UserRepositoryImpl
 from services.expense_service.expense_service_impl import ExpenseServiceImpl
 from services.income_service.income_service_impl import IncomeServiceImpl
+from services.user_service.user_service_impl import UserServiceImpl
 from transaction.pg.transaction_manager_impl import TransactionManagerImpl
 from user_cache.cache.user_cache_impl import UserCache
 
@@ -70,9 +71,14 @@ async def run():
         expense_cat_repo=ExpenseCategoryRepository,
         expense_repo=ExpenseRepository,
     )
+    UserService = UserServiceImpl(
+        transaction_manager=TransactionManager,
+        user_repo=UserRepo,
+    )
     dispatcher = Dispatcher(
         income_service=IncomeService,
         expense_service=ExpenseService,
+        user_service=UserService,
         user_cache=Cache,
     )
     bot = Bot(
