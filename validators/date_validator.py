@@ -22,8 +22,8 @@ def validate_date(coroutine_func: Awaitable):
         """Асинхронная свертка для корутины"""
 
         is_kwargs = not kwargs
-        is_str = not isinstance(kwargs["date"], str)
-        main_check = not is_date_string(kwargs["upd"])
+        is_str = not isinstance(kwargs["upd"].text, str)
+        main_check = not is_date_string(kwargs["upd"].text)
 
         if is_kwargs or is_str or main_check:
             raise ValueError("Дата должна быть строкой в формате DD-MM-YYYY")

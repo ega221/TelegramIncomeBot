@@ -10,6 +10,9 @@ from services.interface import Service
 from repository.interface import UserRepository, IncomeCategoryRepository, IncomeRepository
 from user_cache.interface import UserCache
 from transaction.transaction_manager import TransactionManager
+from validators.category_validator import validate_category
+from validators.date_validator import validate_date
+from validators.number_validator import validate_number
 
 DATETIME_SPLIT_CHAR = "-"
 
@@ -29,15 +32,15 @@ class IncomeServiceImpl(Service):
         self.expense_cat_repo = income_cat_repo
         self.expense_repo = income_repo
 
-    async def initiate(self, upd: Update) -> Message:
+    async def initiate(self, upd: Update = None) -> Message:
         """Метод, инициализирующий временный Income в кэше"""
         payload = TransientIncome(telegram_id=upd.telegram_id)
         print("print payload in initiate method: " + str(payload))
         self.user_cache.update(upd.telegram_id, payload)
         print(self.user_cache.hash_map)
         return Message.INITIATE_INCOME
-
-    async def set_category(self, upd: Update) -> Message:
+    @validate_category
+    async def set_category(self, upd: Update = None) -> Message:
         """Метод, устанавливающий для пользователя с заданным
         telegram_id нужную категорию
         """
@@ -47,8 +50,8 @@ class IncomeServiceImpl(Service):
         payload.category_name = upd.text
         self.user_cache.update(upd.telegram_id, payload)
         return Message.CATEGORY_SET
-
-    async def set_date(self, upd: Update) -> Message:
+    @validate_date
+    async def set_date(self, upd: Update = None) -> Message:
         """Метод, устанавливающий дату для временного Income
         для пользователя с заданным telegram_id
         """
@@ -56,8 +59,8 @@ class IncomeServiceImpl(Service):
         payload.date = datetime.strptime(upd.text, '%d-%m-%Y')
         self.user_cache.update(upd.telegram_id, payload)
         return Message.DATE_SET
-
-    async def set_value(self, upd: Update) -> Message:
+    @validate_number
+    async def set_value(self, upd: Update = None) -> Message:
         """Метод, устанавливающий размер временного Income
         для пользователя с заданным telegram_id
         """
@@ -66,7 +69,7 @@ class IncomeServiceImpl(Service):
         self.user_cache.update(upd.telegram_id, payload)
         return Message.VALUE_SET + "\n" + payload.to_string() + "\n" + Message.ADD_VALUE_MESSAGE
 
-    async def save(self, upd: Update) -> Message:
+    async def save(self, upd: Update = None) -> Message:
         """Метод, сохраняющий временный Income в базу данных
         с помощью соответствующих репозиториев. После успешной записи в бд,
         из кэша будет удалена запись с временным Income
@@ -82,7 +85,7 @@ class IncomeServiceImpl(Service):
         await self.drop(upd)
         return Message.INCOME_SAVED
 
-    async def drop(self, upd: Update) -> Message:
+    async def drop(self, upd: Update = None) -> Message:
         """Метод, удаляющий из кэша запись с временным Income
         для пользователя с заданным telegram_id"""
         self.user_cache.drop(upd.telegram_id)

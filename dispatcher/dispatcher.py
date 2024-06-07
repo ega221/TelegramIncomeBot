@@ -65,24 +65,27 @@ class Dispatcher:
                 elif upd.text in [CommandsEnum.make_income]:
                     print("make income")
                     self.state_machine.set_make_income(upd.telegram_id)
-                    task = asyncio.create_task(self.income_service.initiate(upd))
+                    task = asyncio.create_task(self.income_service.initiate(upd=upd))
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)
                 elif upd.text in [CommandsEnum.make_expense]:
                     print("make expense")
                     self.state_machine.set_make_expense(upd.telegram_id)
-                    task = asyncio.create_task(self.expense_service.initiate(upd))
+                    task = asyncio.create_task(self.expense_service.initiate(upd=upd))
                     message = await task
                     self.state_machine.set_next_status(upd.telegram_id)
                 else:
                     print("other func")
                     if state.func:
-                        task = asyncio.create_task(state.func(upd))
+                        task = asyncio.create_task(state.func(upd=upd))
                         message = await task
                         self.state_machine.set_next_status(upd.telegram_id)
+        except ValueError as e:
+            message = str(e)
         except Exception as e:
             # TODO: Отлавливать какие-то конкретные исключения
             traceback.print_exc(file=sys.stdout)
             print(e)
+            message = e
         result.text = message
         return result

@@ -21,8 +21,8 @@ def validate_number(coroutine_func: Awaitable):
         """Асинхронная свертка для корутины"""
 
         is_kwargs = not kwargs
-        is_str = not isinstance(kwargs["upd"], str)
-        main_check = not is_number(kwargs["value"])
+        is_str = not isinstance(kwargs["upd"].text, str)
+        main_check = not is_number(kwargs["upd"].text)
 
         if is_kwargs or is_str or main_check:
             raise ValueError("Значение должно быть формата 12345.67 или 12345")

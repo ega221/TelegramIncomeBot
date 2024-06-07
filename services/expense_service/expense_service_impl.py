@@ -15,6 +15,9 @@ from repository.interface import (
 from services.interface import Service
 from transaction.transaction_manager import TransactionManager
 from user_cache.interface import UserCache
+from validators.category_validator import validate_category
+from validators.date_validator import validate_date
+from validators.number_validator import validate_number
 
 DATETIME_SPLIT_CHAR = "-"
 
@@ -40,6 +43,7 @@ class ExpenseServiceImpl(Service):
         self.user_cache.update(upd.telegram_id, payload)
         return Message.INITIATE_EXPENSE
 
+    @validate_category
     async def set_category(self, upd: Update) -> Message:
         """Метод, устанавливающий для пользователя с заданным
         telegram_id нужную категорию
@@ -49,6 +53,7 @@ class ExpenseServiceImpl(Service):
         self.user_cache.update(upd.telegram_id, payload)
         return Message.CATEGORY_SET
 
+    @validate_date
     async def set_date(self, upd: Update) -> Message:
         """Метод, устанавливающий дату для временного Expense
         для пользователя с заданным telegram_id
@@ -58,6 +63,7 @@ class ExpenseServiceImpl(Service):
         self.user_cache.update(upd.telegram_id, payload)
         return Message.DATE_SET
 
+    @validate_number
     async def set_value(self, upd: Update) -> Message:
         """Метод, устанавливающий размер временного Expense
         для пользователя с заданным telegram_id
