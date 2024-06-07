@@ -65,7 +65,7 @@ class ExpenseServiceImpl(Service):
         payload = self.user_cache.get(upd.telegram_id)
         payload.value = Decimal(upd.text)
         self.user_cache.update(upd.telegram_id, payload)
-        return Message.VALUE_SET
+        return Message.VALUE_SET + "\n" + payload.to_string() + "\n" + Message.ADD_VALUE_MESSAGE
 
     async def save(self, upd: Update) -> Message:
         """Метод, сохраняющий временный Expense в базу данных
