@@ -5,7 +5,7 @@ from typing import Optional
 
 import aiohttp
 
-from model.response_templates import Update
+from model.tg_update import Update
 
 
 class TgClient:
@@ -48,9 +48,8 @@ class TgClient:
         self, offset: Optional[int] = None, timeout: int = 0
     ) -> Update:
         """Получение сообщений"""
-        res_dict = await asyncio.create_task(
-            self.get_updates(offset=offset, timeout=timeout)
-        )
+        task = asyncio.create_task(self.get_updates(offset=offset, timeout=timeout))
+        res_dict = await task
         return res_dict
 
     async def send_message(self, chat_id: int, text: str) -> None:
