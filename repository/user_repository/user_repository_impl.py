@@ -28,6 +28,18 @@ class UserRepositoryImpl(UserRepository):
         else:
             return None
 
+    async def get_user_by_telegram_id(self, conn: connection, telegram_id: int) -> User | None:
+        record = await conn.fetchrow(
+            """
+            SELECT * FROM users WHERE telegram_id = $1
+            """,
+            telegram_id,
+        )
+        if record:
+            return User(id=record["id"], telegram_id=record["telegram_id"])
+        else:
+            return None
+
     async def delete_user_by_id(self, conn: connection, user_id):
         await conn.execute(
             """

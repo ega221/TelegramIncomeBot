@@ -1,4 +1,4 @@
-"""Модуль с реализацией диспетчера"""
+# """Модуль с реализацией диспетчера"""
 
 import asyncio
 
@@ -41,7 +41,7 @@ class Dispatcher:
                 upd.text in CommandsEnum.get_commands()
             ):
                 # Вызывается метод, инициализирующий нужный по команде сервис
-                if upd.text == CommandsEnum.cansel:
+                if upd.text == CommandsEnum.cancel:
                     # TODO: Добавить ссылку на начальное сообщение
                     self.user_cache.drop(upd.telegram_id)
                     message = "СООБЩЕНИЕ НАЧАЛЬНОЕ"
