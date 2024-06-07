@@ -1,25 +1,33 @@
 """Модуль, реализующий интерфейс сервиса"""
 
-from datetime import datetime
-from model.transient_expense import TransientExpense
-from model.transient_income import TransientIncome
+from model.response_templates import Update
+from model.user import User
+from model.messages import Message
 
 
 class Service:
-    async def initiate(self, telegram_id: int) -> TransientIncome | TransientExpense:
+    async def initiate(self, upd: Update) -> Message:
         pass
 
-    async def set_category(self, telegram_id: int, category_id: int) -> TransientIncome | TransientExpense:
+    async def set_category(self, upd: Update) -> Message:
         pass
 
-    async def set_date(self, telegram_id: int, date: datetime) -> TransientIncome | TransientExpense:
+    async def set_date(self, upd: Update) -> Message:
         pass
 
-    async def set_value(self, telegram_id: int, value: int) -> TransientIncome | TransientExpense:
+    async def set_value(self, upd: Update) -> Message:
         pass
 
-    async def save(self, telegram_id: int) -> TransientIncome | TransientExpense:
+    async def save(self, upd: Update) -> Message:
         pass
 
-    async def drop(self, telegram_id: int) -> None:
+    async def drop(self, upd: Update) -> Message:
+        pass
+
+
+class UserService:
+    async def get(self, upd: Update) -> User:
+        pass
+
+    async def save(self, upd: Update) -> Message:
         pass
