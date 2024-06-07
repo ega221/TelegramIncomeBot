@@ -35,9 +35,7 @@ class IncomeServiceImpl(Service):
     async def initiate(self, upd: Update = None) -> Message:
         """Метод, инициализирующий временный Income в кэше"""
         payload = TransientIncome(telegram_id=upd.telegram_id)
-        print("print payload in initiate method: " + str(payload))
         self.user_cache.update(upd.telegram_id, payload)
-        print(self.user_cache.hash_map)
         async with self.transaction_manager.get_connection() as conn:
             user = await self.user_repo.get_user_by_telegram_id(conn, upd.telegram_id)
             categories = await self.income_cat_repo.get_categories_by_user(conn, user)
