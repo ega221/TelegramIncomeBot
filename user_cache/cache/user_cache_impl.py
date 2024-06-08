@@ -17,7 +17,8 @@ class UserCacheImpl(UserCache):
         """Метод, который удаляет из кэша запись
         о пользователе с соответствующим telegram_id
         """
-        self.hash_map.pop(telegram_id)
+        if (self.hash_map.get(telegram_id, None)):
+            self.hash_map.pop(telegram_id)
 
     def update(self, telegram_id: int, payload: TransientIncome | TransientExpense) -> None:
         """Метод обновляет запись в кэш по-соответствующему telegram_id
